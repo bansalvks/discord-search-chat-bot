@@ -21,17 +21,18 @@ bot.on('ready', function (evt) {
 });
 
 // user, userID, channelID, message, evt
-bot.on('message', function (req) {
+bot.on('message', async function (req) {
     if (req.author.id === bot.user.id) {
         return;
     }
+
     const {
         author,
         content: message,
         channel,
     } = req;
-
-    const response = responseFactory({
+    
+    const response = await responseFactory({
         message,
         channelId: channel.id,
         userId: author.id

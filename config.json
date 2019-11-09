@@ -1,3 +1,7 @@
 {
-    "token":""
+    "token": "NjQyNjIzNzg5NDQ3OTA1MzEz.XcZtFQ.KRgc-a-5uMTrA_FgwT0jhrmo1Ig",
+    "api": {
+        "newsApi": "https://newsapi.org/v2/everything",
+        "token": ""
+    }
 }

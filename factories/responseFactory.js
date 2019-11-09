@@ -1,8 +1,10 @@
 const { INTENT_ENUMS } = require("../intentEnum");
 const { saveNewMessage, getMessagesByIntent } = require('../db/chatStorage')
+const { getNewsByKeyword } = require('../services/newSearchApi')
+const { buildDiscordLinks } = require('../builders/discordResponseBuilder')
 
 module.exports = {
-    responseFactory: function ({
+    responseFactory: async function ({
         message,
         channelId,
         userId
@@ -29,7 +31,27 @@ module.exports = {
                         ts: new Date()
                     })
 
-                    return 'I am Googling'
+                    const searchResultString = await getNewsByKeyword({
+                        keyword: currentMessage
+                    })
+                    try {
+                        const searchResultJson = JSON.parse(searchResultString)
+
+                        const responseData = searchResultJson.articles
+                            .splice(0, 5)
+                            .map(function (item) {
+                                return {
+                                    title: item.title,
+                                    link: item.url
+                                }
+                            })
+                        return buildDiscordLinks({
+                            data: responseData,
+                            title: 'Top 5 Searches'
+                        });
+                    } catch (error) {
+                        return 'Unable to Google due to some error';
+                    }
                 case INTENT_ENUMS.RESENT:
                     const searches = getMessagesByIntent({
                         userId,
