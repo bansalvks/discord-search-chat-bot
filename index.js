@@ -43,4 +43,4 @@ bot.on('message', async function (req) {
     }
 });
 
-bot.login(token)
+bot.login(token || process.env.DISCORD)

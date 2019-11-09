@@ -15,7 +15,7 @@ module.exports = {
             url,
             qs: {
                 q,
-                apiKey: token,
+                apiKey: token || process.env.NEWSAPI,
             }
         });
     }
