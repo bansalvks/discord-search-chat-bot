@@ -21,5 +21,27 @@ module.exports = {
         discordOutput.addField(title, linkOutput)
 
         return discordOutput;
+    },
+
+    buildDiscordText: function ({
+        textList,
+        title,
+    }) {
+        const discordOutput = new Discord.RichEmbed()
+
+        let listOutput = '\n';
+
+        textList.forEach(function (text, i) {
+            listOutput += `${i + 1}. ${text}`;
+
+            if (i !== textList.length - 1) {
+                listOutput += '\n'
+                listOutput += '\n'
+            }
+        })
+
+        discordOutput.addField(title, listOutput)
+
+        return discordOutput;
     }
 }

@@ -1,7 +1,7 @@
 const { INTENT_ENUMS } = require("../intentEnum");
 const { saveNewMessage, getMessagesByIntent } = require('../db/chatStorage')
 const { getNewsByKeyword } = require('../services/newSearchApi')
-const { buildDiscordLinks } = require('../builders/discordResponseBuilder')
+const { buildDiscordLinks, buildDiscordText } = require('../builders/discordResponseBuilder')
 
 module.exports = {
     responseFactory: async function ({
@@ -47,7 +47,7 @@ module.exports = {
                             })
                         return buildDiscordLinks({
                             data: responseData,
-                            title: 'Top 5 Searches'
+                            title: 'Top 5 Searches for ' + currentMessage
                         });
                     } catch (error) {
                         return 'Unable to Google due to some error';
@@ -59,20 +59,23 @@ module.exports = {
                         intent: INTENT_ENUMS.GOOGLE,
                         keyword: args[1] || ''
                     })
+
                     if (searches.length < 1) {
                         return 'You have not searches yet anything'
                     }
 
-                    let result = 'Here are your recent searches ';
+                    let title = 'Here are your recent searches';
+
+                    const textList = [];
 
                     searches.forEach(function (item, i) {
-                        result += item.message;
-                        if (searches.length - 1 !== i) {
-                            result += ", "
-                        }
+                        textList.push(item.message)
                     });
 
-                    return result;
+                    return buildDiscordText({
+                        title,
+                        textList,
+                    })
             }
         }
 

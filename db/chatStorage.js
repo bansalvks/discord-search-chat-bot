@@ -44,7 +44,7 @@ function getMessagesByIntent({
     }
 
     const result = db[channelId][userId].filter(function (item) {
-        return item.intent === intent && item.message.indexOf(keyword) > -1
+        return item.intent === intent && (!keyword || item.message.indexOf(keyword) > -1)
     })
     return result;
 }
