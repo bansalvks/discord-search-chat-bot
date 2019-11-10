@@ -1,7 +1,7 @@
 const { INTENT_ENUMS } = require("../intentEnum");
-const { saveNewMessage, getMessagesByIntent } = require('../db/chatStorage')
-const { getNewsByKeyword } = require('../services/newSearchApi')
-const { buildDiscordLinks, buildDiscordText } = require('../builders/discordResponseBuilder')
+const GreetingResponseBuilder = require("../builders/response/greeting")
+const HistoryResponseBuilder = require("../builders/response/history")
+const SearchResponseBuilder = require("../builders/response/search")
 
 module.exports = {
     responseFactory: async function ({
@@ -15,72 +15,25 @@ module.exports = {
         if (hasIntent) {
             const args = message.substring(1).split(' ');
 
-            switch (args[0].toLowerCase()) {
+            const intent = args[0].toLowerCase();
+            args.shift();
+            const currentMessage = args.join(' ');
+
+            switch (intent) {
                 case INTENT_ENUMS.HEY:
-                    return 'hi';
+                    return GreetingResponseBuilder.build()
                 case INTENT_ENUMS.GOOGLE:
-                    const intent = args[0];
-                    args.shift();
-
-                    const currentMessage = args.join(' ');
-
-                    if(!currentMessage){
-                        return "Please provide a keyword for search";
-                    }
-
-                    await saveNewMessage({
+                    return await SearchResponseBuilder.build({
                         userId,
                         channelId,
                         intent,
-                        message: currentMessage || '',
-                        ts: new Date()
+                        currentMessage,
                     })
-
-                    const searchResultString = await getNewsByKeyword({
-                        keyword: currentMessage
-                    })
-
-                    try {
-                        const searchResultJson = JSON.parse(searchResultString)
-
-                        const responseData = searchResultJson.articles
-                            .splice(0, 5)
-                            .map(function (item) {
-                                return {
-                                    title: item.title,
-                                    link: item.url
-                                }
-                            })
-                        return buildDiscordLinks({
-                            data: responseData,
-                            title: 'Top 5 Searches for ' + currentMessage
-                        });
-                    } catch (error) {
-                        return 'Unable to Google due to some error';
-                    }
                 case INTENT_ENUMS.RESENT:
-                    const searches = await getMessagesByIntent({
+                    return await HistoryResponseBuilder.build({
                         userId,
                         channelId,
-                        intent: INTENT_ENUMS.GOOGLE,
-                        keyword: args[1] || ''
-                    })
-
-                    if (searches.length < 1) {
-                        return 'You have not searches yet anything'
-                    }
-
-                    let title = 'Here are your recent searches';
-
-                    const textList = [];
-                    
-                    searches.forEach(function (item, i) {
-                        textList.push(item.message)
-                    });
-
-                    return buildDiscordText({
-                        title,
-                        textList,
+                        currentMessage,
                     })
             }
         }

@@ -1,4 +1,4 @@
-const { GET } = require('../utils/xhrHelper')
+const { GET } = require('../utils/xhrUtil')
 const { api: {
     newsApi,
     token,

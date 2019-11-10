@@ -3,7 +3,7 @@ const http = require('http');
 const logger = require('winston');
 const { responseFactory } = require('./factories/responseFactory');
 const { token, dbURI } = require('./config.json');
-const { initMongoose } = require('./utils/mongooseHelper');
+const { initMongoose } = require('./utils/mongooseUtil');
 
 // connect mongo
 initMongoose(process.env.dbURI || dbURI);
