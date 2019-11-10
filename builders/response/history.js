@@ -1,13 +1,14 @@
 
 const { getMessagesByIntent } = require('../../db/chatStorage')
 const { buildDiscordText } = require('../../utils/discordResponseUtil')
-
+const { INTENT_ENUMS } = require('../../intentEnum')
 module.exports = {
     build: async function ({
         userId,
         channelId,
         currentMessage,
     }) {
+        debugger
         const searches = await getMessagesByIntent({
             userId,
             channelId,

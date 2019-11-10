@@ -23,6 +23,7 @@ module.exports = {
                 case INTENT_ENUMS.HEY:
                     return GreetingResponseBuilder.build()
                 case INTENT_ENUMS.GOOGLE:
+                    debugger
                     return await SearchResponseBuilder.build({
                         userId,
                         channelId,
