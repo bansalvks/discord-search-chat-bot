@@ -1,4 +1,7 @@
 const Discord = require('discord.js');
+
+const http = require('http');
+
 const logger = require('winston');
 const { responseFactory } = require('./factories/responseFactory');
 const { token } = require('./config.json');
@@ -44,3 +47,7 @@ bot.on('message', async function (req) {
 });
 
 bot.login(token || process.env.DISCORD)
+
+
+// heroku crashing if we are not listening to its port
+http.createServer().listen(process.env.PORT || 3002);
