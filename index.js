@@ -1,10 +1,12 @@
 const Discord = require('discord.js');
-
 const http = require('http');
-
 const logger = require('winston');
 const { responseFactory } = require('./factories/responseFactory');
-const { token } = require('./config.json');
+const { token, dbURI } = require('./config.json');
+const { initMongoose } = require('./utils/mongooseHelper');
+
+// connect mongo
+initMongoose(process.env.dbURI || dbURI);
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
@@ -34,7 +36,7 @@ bot.on('message', async function (req) {
         content: message,
         channel,
     } = req;
-    
+
     const response = await responseFactory({
         message,
         channelId: channel.id,

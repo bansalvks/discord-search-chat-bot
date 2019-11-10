@@ -23,7 +23,12 @@ module.exports = {
                     args.shift();
 
                     const currentMessage = args.join(' ');
-                    saveNewMessage({
+
+                    if(!currentMessage){
+                        return "Please provide a keyword for search";
+                    }
+
+                    await saveNewMessage({
                         userId,
                         channelId,
                         intent,
@@ -34,6 +39,7 @@ module.exports = {
                     const searchResultString = await getNewsByKeyword({
                         keyword: currentMessage
                     })
+
                     try {
                         const searchResultJson = JSON.parse(searchResultString)
 
@@ -53,7 +59,7 @@ module.exports = {
                         return 'Unable to Google due to some error';
                     }
                 case INTENT_ENUMS.RESENT:
-                    const searches = getMessagesByIntent({
+                    const searches = await getMessagesByIntent({
                         userId,
                         channelId,
                         intent: INTENT_ENUMS.GOOGLE,
@@ -67,7 +73,7 @@ module.exports = {
                     let title = 'Here are your recent searches';
 
                     const textList = [];
-
+                    
                     searches.forEach(function (item, i) {
                         textList.push(item.message)
                     });

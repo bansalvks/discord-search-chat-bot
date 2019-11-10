@@ -3,5 +3,6 @@
     "api": {
         "newsApi": "https://newsapi.org/v2/everything",
         "token": ""
-    }
+    },
+    "dbURI": ""
 }

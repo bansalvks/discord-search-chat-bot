@@ -1,52 +1,68 @@
-global.db = {}; // TODO: write mongo layer
-/* Example
-    channel = {}
-        user = [{}]
-            message
-            intent
-*/
+const UserSchema = require('../schemas/users')
 
-function saveNewMessage({
+async function saveNewMessage({
     userId,
     channelId,
     intent,
     message = "",
     ts
 }) {
-    if (!db[channelId]) {
-        db[channelId] = {}
-    }
+    //  UPSERT in mongo
+    try {
+        UserSchema.findOne({
+            userId,
+            channelId
+        }, async function (error, user) {
+            if (error) return;
 
-    if (!db[channelId][userId]) {
-        db[channelId][userId] = []
-    }
+            let newRecord = user
 
-    db[channelId][userId].push({
-        message,
-        intent,
-        ts,
-    })
+            if (!user) {
+                newRecord = new UserSchema({
+                    userId,
+                    channelId
+                });
+            }
+
+            newRecord.searches.push({
+                intent,
+                message,
+            })
+
+            await newRecord.save();
+        });
+
+    } catch (error) {
+        console.error(error)
+    }
 }
 
-function getMessagesByIntent({
+async function getMessagesByIntent({
     userId,
     channelId,
     intent,
     keyword,
 }) {
+    try {
+        const records = await UserSchema.find({
+            userId,
+            channelId,
+            'searches.intent': intent,
+        });
 
-    if (!db[channelId]) {
-        return []
+        if (records.length < 1) {
+            "No recent Searches Found";
+        }
+
+        const result = records[0].searches.filter(function (item) {
+            return item.intent === intent && (!keyword || item.message.indexOf(keyword) > -1)
+        })
+
+        return JSON.parse(JSON.stringify(result));
+
+    } catch (error) {
+        console.error(error)
     }
-
-    if (!db[channelId][userId]) {
-        return []
-    }
-
-    const result = db[channelId][userId].filter(function (item) {
-        return item.intent === intent && (!keyword || item.message.indexOf(keyword) > -1)
-    })
-    return result;
 }
 
 module.exports = {
