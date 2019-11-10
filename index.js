@@ -4,7 +4,7 @@ const logger = require('winston');
 const { responseFactory } = require('./factories/responseFactory');
 const { token, dbURI } = require('./config.json');
 const { initMongoose } = require('./utils/mongooseUtil');
-
+const { GET } = require('./utils/xhrUtil')
 // connect mongo
 initMongoose(process.env.dbURI || dbURI);
 
@@ -51,7 +51,14 @@ bot.on('message', async function (req) {
 bot.login(token || process.env.DISCORD)
 
 
-// heroku crashing if we are not listening to its port
+// heroku crashing if we are not listening to its port // if instance stay idle for more than 20 mins it goes off
 http.createServer(function (req, res) {
     res.end(); //end the response
+
 }).listen(process.env.PORT || 3002);
+
+var reqTimer = setTimeout(async function wakeUp() {
+    await GET("https://safe-stream-53824.herokuapp.com");
+    console.log("WAKE UP DYNO");
+    return (reqTimer = setTimeout(wakeUp, 1200000));
+}, 1200000);
