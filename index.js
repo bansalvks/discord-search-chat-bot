@@ -52,4 +52,6 @@ bot.login(token || process.env.DISCORD)
 
 
 // heroku crashing if we are not listening to its port
-http.createServer().listen(process.env.PORT || 3002);
+http.createServer(function (req, res) {
+    res.end(); //end the response
+}).listen(process.env.PORT || 3002);
